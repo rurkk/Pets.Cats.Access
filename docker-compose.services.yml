@@ -59,14 +59,3 @@ services:
       - "9000:9000"
     environment:
       KAFKA_BROKERCONNECT: kafka:9092
-
-  seq:
-    image: datalust/seq:2022.1
-    restart: unless-stopped
-    volumes:
-      - ./logs:/data
-    ports:
-      - "5341:5341" # порт для приема логов
-      - "8001:80"   # UI порт
-    environment:
-      - ACCEPT_EULA=Y

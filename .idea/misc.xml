@@ -1,5 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="MavenProjectsManager">
+    <option name="originalFiles">
+      <list>
+        <option value="$PROJECT_DIR$/src/Pets.Cats.Access.Api/pom.xml" />
+        <option value="$PROJECT_DIR$/src/Application/pom.xml" />
+        <option value="$PROJECT_DIR$/src/Pets.Cats.Access.Persistence/pom.xml" />
+        <option value="$PROJECT_DIR$/src/Pets.Cats.Access.Security/pom.xml" />
+        <option value="$PROJECT_DIR$/Pets.Cats.Access.Service/pom.xml" />
+        <option value="$PROJECT_DIR$/src/Pets.Cats.Access.Service/pom.xml" />
+        <option value="$PROJECT_DIR$/src/Pets.Cats.Access.Services/pom.xml" />
+      </list>
+    </option>
+    <option name="ignoredFiles">
+      <set>
+        <option value="$PROJECT_DIR$/src/Pets.Cats.Access.Service/pom.xml" />
+      </set>
+    </option>
+  </component>
   <component name="ProjectRootManager" version="2" languageLevel="JDK_19" default="true" project-jdk-name="19" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/out" />
   </component>

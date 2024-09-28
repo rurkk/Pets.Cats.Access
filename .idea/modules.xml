@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Pets.Cats.Access.iml" filepath="$PROJECT_DIR$/.idea/Pets.Cats.Access.iml" />
+      <module fileurl="file://$PROJECT_DIR$/src/Pets.Cats.Access.Persistence/petscatsaccesspersistence.iml" filepath="$PROJECT_DIR$/src/Pets.Cats.Access.Persistence/petscatsaccesspersistence.iml" />
     </modules>
   </component>
 </project>
