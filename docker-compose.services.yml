@@ -43,6 +43,7 @@ services:
     image: bitnami/kafka:3.0
     command: >
       sh -c  "kafka-topics.sh --create --topic pets.cats.data.create-cat --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka:9092 && \
+              kafka-topics.sh --create --topic pets.cats.data.create-cat-result --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka:9092 && \
               kafka-topics.sh --create --topic pets.owners.data.create-owner --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka:9092 && \
               kafka-topics.sh --create --topic pets.cats.data.get-cat --partitions 1 --replication-factor 1 --if-not-exists --bootstrap-server kafka:9092"
     depends_on:

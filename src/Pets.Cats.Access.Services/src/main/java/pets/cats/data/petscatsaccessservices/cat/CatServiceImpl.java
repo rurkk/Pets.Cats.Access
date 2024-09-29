@@ -1,58 +1,43 @@
 package pets.cats.data.petscatsaccessservices.cat;
 
+import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.kafka.listener.MessageListenerContainer;
-import org.springframework.kafka.listener.config.ContainerProperties;
-import org.springframework.kafka.listener.KafkaMessageListenerContainer;
-import org.springframework.kafka.listener.ListenerContainerFactory;
-import org.springframework.kafka.listener.MessageListener;
-import org.springframework.messaging.support.GenericMessage;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.requestreply.ReplyingKafkaTemplate;
+import org.springframework.kafka.requestreply.RequestReplyFuture;
 import org.springframework.stereotype.Service;
 import pets.cats.data.petscatsaccessservices.dto.CatDTO;
 
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ExecutionException;
 
 @Service
 public class CatServiceImpl implements CatService {
 
+    @Value("${pets.cats.data.create-cat}")
+    private String requestCreateCatTopic;
     private final CatDTOModelMapper catDTOModelMapper;
-    private final KafkaTemplate<String, CatModel> kafkaTemplate;
-
-    private final CountDownLatch latch = new CountDownLatch(1);
-    private CatResponse receivedResponse;
+    private final ReplyingKafkaTemplate<String, CatCreate, CatResult> replyingKafkaTemplate;
 
     @Autowired
-    public CatServiceImpl(CatDTOModelMapper catDTOModelMapper,
-                          KafkaTemplate<String, CatModel> kafkaTemplate,
-                          ListenerContainerFactory<MessageListener<String, CatResponse>> factory) {
+    public CatServiceImpl(
+            CatDTOModelMapper catDTOModelMapper,
+            ReplyingKafkaTemplate<String, CatCreate, CatResult> replyingKafkaTemplate) {
         this.catDTOModelMapper = catDTOModelMapper;
-        this.kafkaTemplate = kafkaTemplate;
-
-        MessageListenerContainer container = factory.createContainer("pets.cats.data.create-cat-response");
-        container.setupMessageListener((MessageListener<String, CatResponse>) record -> {
-            receivedResponse = record.value();
-            latch.countDown();
-        });
-        container.start();
+        this.replyingKafkaTemplate = replyingKafkaTemplate;
     }
 
     @Override
-    public CatDTO createCat(CatDTO cat) {
-        var catTransfer = catDTOModelMapper.toModel(cat);
+    public
+    ResponseEntity<CatResult> createCat(CatDTO cat) throws ExecutionException, InterruptedException {
+        var catCreate = catDTOModelMapper.toModel(cat);
 
-        kafkaTemplate.send("pets.cats.data.create-cat", catTransfer);
+        ProducerRecord<String, CatCreate> record = new ProducerRecord<>(requestCreateCatTopic, null, catCreate.getId().toString(), catCreate);
+        RequestReplyFuture<String, CatCreate, CatResult> future = replyingKafkaTemplate.sendAndReceive(record);
+        ConsumerRecord<String, CatResult> response = future.get();
 
-        try {
-            if (latch.await(10, TimeUnit.SECONDS)) {
-                return receivedResponse;
-            } else {
-                throw new RuntimeException("Timeout waiting for response");
-            }
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new RuntimeException("Thread was interrupted", e);
-        }
+        return new ResponseEntity<>(response.value(), HttpStatus.OK);
     }
 }
